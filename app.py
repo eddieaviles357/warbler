@@ -65,14 +65,13 @@ def signup():
     """
 
     form = UserAddForm()
-
-    if form.validate_on_submit():
+    if form.is_submitted() & form.validate():
         try:
             user = User.signup(
                 username=form.username.data,
-                password=form.password.data,
                 email=form.email.data,
-                image_url=form.image_url.data or User.image_url.default.arg,
+                password=form.password.data,
+                image_url=form.image_url.data or User.image_url.default.arg
             )
             db.session.commit()
 
@@ -318,3 +317,6 @@ def add_header(req):
     req.headers["Expires"] = "0"
     req.headers['Cache-Control'] = 'public, max-age=0'
     return req
+
+if __name__ == '__main__':
+    app.run(debug=True)
