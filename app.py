@@ -215,8 +215,12 @@ def profile():
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
-    
-
+    form = EditUserForm()
+    if form.validate_on_submit():
+        flash('Updated successful', 'success')
+        raise
+        # return redirect(f'/users/{}')
+    return render_template('users/edit.html', form=form)
 
 @app.route('/users/delete', methods=["POST"])
 def delete_user():
