@@ -234,6 +234,7 @@ def profile():
                 flash('Incorrect credentials', 'danger')
                 return redirect('/')
         except IntegrityError:
+            db.session.rollback()
             flash("Username already taken", 'danger')
             return render_template('users/edit.html', form=form)
     return render_template('users/edit.html', form=form)
