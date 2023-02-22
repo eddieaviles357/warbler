@@ -219,15 +219,22 @@ def profile():
     form = EditUserForm()
 
     if form.validate_on_submit():
-        if (user := User.authenticate(g.user.username,form.password.data)):
-            user.username         = form.username.data
-            user.email            = form.email.data
-            user.image_url        = form.image_url.data
-            user.header_image_url = form.header_image_url.data
-            user.bio              = form.bio.data
-            raise
-        flash('Updated successful', 'success')
-        # return redirect(f'/users/{}')
+        try:
+            if (user := User.authenticate(g.user.username,form.password.data)):
+                user.username         = form.username.data
+                user.email            = form.email.data
+                user.image_url        = form.image_url.data
+                user.header_image_url = form.header_image_url.data
+                user.bio              = form.bio.data
+                db.session.commit()
+                flash('Updated successful', 'success')
+                return redirect(f'/users/{user.id}')
+            else:
+                flash('Incorrect credentials', 'danger')
+                return redirect('home.html')
+        except IntegrityError:
+            flash("Username already taken", 'danger')
+            return render_template('users/edit.html', form=form)
     return render_template('users/edit.html', form=form)
 
 @app.route('/users/delete', methods=["POST"])
