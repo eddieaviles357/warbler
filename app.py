@@ -76,7 +76,7 @@ def signup():
             db.session.commit()
 
         except IntegrityError as err:
-            # check if username or email is already in detabase
+            # check if username or email is already in database
             # send appropiate error to client
             field_err = None
             if 'username' in str(err.orig):
