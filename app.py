@@ -215,7 +215,9 @@ def profile():
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
+    
     form = EditUserForm()
+    
     if form.validate_on_submit():
         flash('Updated successful', 'success')
         raise
