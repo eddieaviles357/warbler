@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 # from csv import DictReader
 from forms import UserAddForm, LoginForm, MessageForm, EditUserForm
 from models import db, connect_db, User, Message
-
+from utils import array_to_set
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
@@ -336,6 +336,10 @@ def homepage():
     """
 
     if g.user:
+        following_ids = set([following.id for following in g.user.following])
+        followers_ids = set([follower.id for follower in g.user.followers])
+        import pdb
+        pdb.set_trace()
         messages = (Message
                     .query
                     .order_by(Message.timestamp.desc())
