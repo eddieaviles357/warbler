@@ -217,10 +217,16 @@ def profile():
         return redirect("/")
     
     form = EditUserForm()
-    
+
     if form.validate_on_submit():
+        if (user := User.authenticate(g.user.username,form.password.data)):
+            user.username         = form.username.data
+            user.email            = form.email.data
+            user.image_url        = form.image_url.data
+            user.header_image_url = form.header_image_url.data
+            user.bio              = form.bio.data
+            raise
         flash('Updated successful', 'success')
-        raise
         # return redirect(f'/users/{}')
     return render_template('users/edit.html', form=form)
 
