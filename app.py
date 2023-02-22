@@ -216,22 +216,23 @@ def profile():
         flash("Access unauthorized.", "danger")
         return redirect("/")
     
-    form = EditUserForm()
+    user = g.user
+    form = EditUserForm(obj=user)
 
     if form.validate_on_submit():
         try:
-            if (user := User.authenticate(g.user.username,form.password.data)):
+            if User.authenticate(user.username,form.password.data):
                 user.username         = form.username.data
                 user.email            = form.email.data
-                user.image_url        = form.image_url.data
-                user.header_image_url = form.header_image_url.data
+                user.image_url        = form.image_url.data or "/static/images/default-pic.png"
+                user.header_image_url = form.header_image_url.data or "/static/images/warbler-hero.jpg"
                 user.bio              = form.bio.data
                 db.session.commit()
                 flash('Updated successful', 'success')
                 return redirect(f'/users/{user.id}')
             else:
                 flash('Incorrect credentials', 'danger')
-                return redirect('home.html')
+                return redirect('/')
         except IntegrityError:
             flash("Username already taken", 'danger')
             return render_template('users/edit.html', form=form)
