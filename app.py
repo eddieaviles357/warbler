@@ -75,8 +75,18 @@ def signup():
             )
             db.session.commit()
 
-        except IntegrityError:
-            flash("Username already taken", 'danger')
+        except IntegrityError as err:
+            # check if username or email is already in detabase
+            # send appropiate error to client
+            field_err = None
+            if 'username' in str(err.orig):
+                field_err = 'Username'
+                form.username.errors.append(f'{field_err} already taken')
+            elif 'email' in str(err.orig):
+                field_err = 'Email'
+                form.email.errors.append(f'{field_err} already taken')
+            db.session.rollback()
+            flash(f"{field_err} already taken", 'danger')
             return render_template('users/signup.html', form=form)
 
         do_login(user)
@@ -233,9 +243,18 @@ def profile():
             else:
                 flash('Incorrect credentials', 'danger')
                 return redirect('/')
-        except IntegrityError:
+        except IntegrityError as err:
+            # print('\n\ntype=',type(err.orig), '***', err.orig,'\n\n\n')
+            # print('\n\ntype=', type(err.statement), '***', err.statement, '\n\n\n')
+            field_err = None
+            if 'username' in str(err.orig):
+                field_err = 'Username'
+                form.username.errors.append(f'{field_err} already taken')
+            elif 'email' in str(err.orig):
+                field_err = 'Email'
+                form.email.errors.append(f'{field_err} already taken')
             db.session.rollback()
-            flash("Username already taken", 'danger')
+            flash(f"{field_err} already taken", 'danger')
             return render_template('users/edit.html', form=form)
     return render_template('users/edit.html', form=form)
 
