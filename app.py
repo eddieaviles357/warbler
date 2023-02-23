@@ -165,6 +165,18 @@ def users_show(user_id):
                 .all())
     return render_template('users/show.html', user=user, messages=messages)
 
+@app.route('/users/add_like/<int:message_id>', methods=["POST"])
+def messages_liked(message_id):
+    """Liked message"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    like = Likes(user_id=g.user.id, message_id=message_id)
+    
+    db.session.add(like)
+    db.session.commit()
+    return redirect("/")
 
 @app.route('/users/<int:user_id>/following')
 def show_following(user_id):
@@ -322,19 +334,6 @@ def messages_destroy(message_id):
     db.session.commit()
 
     return redirect(f"/users/{g.user.id}")
-
-@app.route('/users/add_like/<int:message_id>', methods=["POST"])
-def messages_liked(message_id):
-    """Liked message"""
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-    
-    like = Likes(user_id=g.user.id, message_id=message_id)
-    
-    db.session.add(like)
-    db.session.commit()
-    return redirect("/")
 
 ##############################################################################
 # Homepage and error pages
