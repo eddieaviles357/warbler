@@ -171,11 +171,13 @@ def messages_liked(message_id):
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
-    
-    like = Likes(user_id=g.user.id, message_id=message_id)
-    
-    db.session.add(like)
-    db.session.commit()
+    try:
+        like = Likes(user_id=g.user.id, message_id=message_id)
+        
+        db.session.add(like)
+        db.session.commit()
+    except IntegrityError as err:
+        db.session.rollback()
     return redirect("/")
 
 @app.route('/users/<int:user_id>/following')
