@@ -336,16 +336,15 @@ def homepage():
     """
 
     if g.user:
-        following_ids = set([following.id for following in g.user.following])
-        followers_ids = set([follower.id for follower in g.user.followers])
-        import pdb
-        pdb.set_trace()
+        following_ids = [g.user.id] + [following.id for following in g.user.following]
+
         messages = (Message
                     .query
+                    .filter(Message.user_id.in_(following_ids))
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
-
+        print('\n\nfollowings', len(following_ids),'\n\n',messages, '\n\n\n')
         return render_template('home.html', messages=messages)
 
     else:
