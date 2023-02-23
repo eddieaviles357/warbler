@@ -171,10 +171,16 @@ def messages_liked(message_id):
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
+    
     try:
+        if (like:=Likes.query.filter(Likes.message_id==message_id).first()):
+            db.session.delete(like)
+            db.session.commit()
+            return redirect("/")
         like = Likes(user_id=g.user.id, message_id=message_id)
         
         db.session.add(like)
+        
         db.session.commit()
     except IntegrityError as err:
         db.session.rollback()
