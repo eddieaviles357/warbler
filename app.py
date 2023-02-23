@@ -344,7 +344,6 @@ def homepage():
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
-        print('\n\nfollowings', len(following_ids),'\n\n',messages, '\n\n\n')
         return render_template('home.html', messages=messages)
 
     else:
