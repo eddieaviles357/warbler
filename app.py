@@ -165,6 +165,11 @@ def users_show(user_id):
                 .all())
     return render_template('users/show.html', user=user, messages=messages)
 
+# **************************************
+# **************** ATTN!!! *************
+# ************* AJAX call needs ********
+# ************ to be implemented *******
+# **************************************
 @app.route('/users/add_like/<int:message_id>', methods=["POST"])
 def messages_liked(message_id):
     """Liked message"""
@@ -188,6 +193,11 @@ def messages_liked(message_id):
     except IntegrityError as err:
         db.session.rollback()
     return redirect("/")
+# ***************** UBOVE **************
+# **************** ATTN!!! *************
+# ************* AJAX call needs ********
+# ************ to be implemented *******
+# **************************************
 
 @app.route('/users/<int:user_id>/following')
 def show_following(user_id):
