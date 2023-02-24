@@ -165,6 +165,14 @@ def users_show(user_id):
                 .all())
     return render_template('users/show.html', user=user, messages=messages)
 
+@app.route("/users/likes/<int:user_id>")
+def display_likes(user_id):
+    """Show users likes page"""
+    
+    user = User.query.get_or_404(user_id)
+
+    return render_template('users/likes.html', user=user, messages=user.likes)
+
 # **************************************
 # **************** ATTN!!! *************
 # ************* AJAX call needs ********
