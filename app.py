@@ -173,7 +173,10 @@ def messages_liked(message_id):
         return redirect("/")
     
     try:
-        if (like:=Likes.query.filter(Likes.message_id==message_id).first()):
+        if (like:=Likes.query.filter(Likes.user_id==g.user.id)
+            .filter(Likes.message_id==message_id)
+            .first()):
+            
             db.session.delete(like)
             db.session.commit()
             return redirect("/")
