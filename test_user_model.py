@@ -52,7 +52,17 @@ class UserModelTestCase(TestCase):
                 username="testuser",
                 password="HASHED_PASSWORD"
             )
-            db.session.add(u)
+            u2 = User(
+                email="test2@test2.com",
+                username="testuser2",
+                password="HASHED_PASSWORD"
+            )
+            u3 = User(
+                email="test3@test3.com",
+                username="testuser3",
+                password="HASHED_PASSWORD"
+            )
+            db.session.add_all([u,u2,u3])
             db.session.commit()
 
 
@@ -66,11 +76,20 @@ class UserModelTestCase(TestCase):
         with self.client:
             with app.app_context():
                 u = User.query.first()
-                print(u)
                 # User should have no messages & no followers
                 self.assertEqual(len(u.messages), 0)
                 self.assertEqual(len(u.followers), 0)
                 # User __repr__  displays correct information about User
                 self.assertEqual(u.__repr__(), f"<User #{u.id}: {u.username}, {u.email}>")
 
-    # def test_user_repr(self):
+    def test_is_followed_by(self):
+        """ Test for method is_followed_by """
+        with self.client:
+            with app.app_context():
+                users = User.query.all()
+                u = users[0]
+                u2 = users[1]
+                u.following.append(u2)
+                db.session.commit()
+                # is user being followed by other user
+                self.assertTrue(u2.is_followed_by(u))
