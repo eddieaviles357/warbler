@@ -116,13 +116,12 @@ class UserModelTestCase(TestCase):
             users_orig = User.query.all()
             # get length of orig users in db to be used to compare later
             orig_users_len = len(users_orig)
-            db.session.add(
-                User(
-                    email="signup@test.com",
+            User.signup(
                     username="signupusertest",
-                    password="SIGNUPUSERTEST"
+                    email="signup@test.com",
+                    password="SIGNUPUSERTEST",
+                    image_url=''
                     )
-                )
             db.session.commit()
             users = User.query.all()
             # get updated users length to compare old users length
@@ -140,7 +139,7 @@ class UserModelTestCase(TestCase):
                 )
                 db.session.commit()
             db.session.rollback()
-            
+
             # test integrityError with username
             with self.assertRaises(exc.IntegrityError):
                 db.session.add(
@@ -152,3 +151,22 @@ class UserModelTestCase(TestCase):
                 )
                 db.session.commit()
             db.session.rollback()
+
+    def test_authenticate(self):
+        """ Test authenticating user """
+
+        with app.app_context():
+            user = User.signup(
+                    username="signupusertest",
+                    email="signup@test.com",
+                    password="SIGNUPUSERTEST",
+                    image_url=''
+                    )
+            db.session.commit()
+            # Wrong password
+            self.assertFalse(User.authenticate(user.username, 'SIGNUPUSERTESt'))
+            # Wrong username
+            self.assertFalse(User.authenticate('wronguser', 'SIGNUPUSERTEST'))
+            # Correct credentials
+            self.assertTrue(User.authenticate(user.username, 'SIGNUPUSERTEST'))
+                
