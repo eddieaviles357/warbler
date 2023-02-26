@@ -34,28 +34,19 @@ class UserModelTestCase(TestCase):
 
     def setUp(self):
         """Create test client, add sample data."""
+        self.client = app.test_client()
         app.config.update({
             "TESTING": True,
             "SQLALCHEMY_ECHO": False,
             "SQLALCHEMY_DATABASE_URI": os.environ.get('DATABASE_URL', 'postgresql:///blogly_test'),
             "DEBUG_TB_HOSTS": ["dont-show-debug-toolbar"]
             })
+
         with app.app_context():
             User.query.delete()
             Message.query.delete()
             Follows.query.delete()
 
-        self.client = app.test_client()
-
-    def tearDown(self):
-        """Clean up any fouled transaction."""
-        with app.app_context():
-            db.session.rollback()
-            
-    def test_user_model(self):
-        """Does basic model work?"""
-
-        with app.app_context():
             u = User(
                 email="test@test.com",
                 username="testuser",
@@ -64,6 +55,22 @@ class UserModelTestCase(TestCase):
             db.session.add(u)
             db.session.commit()
 
-            # User should have no messages & no followers
-            self.assertEqual(len(u.messages), 0)
-            self.assertEqual(len(u.followers), 0)
+
+    def tearDown(self):
+        """Clean up any fouled transaction."""
+        with app.app_context():
+            db.session.rollback()
+            
+    def test_user_model(self):
+        """Does basic model work?"""
+        with self.client:
+            with app.app_context():
+                u = User.query.first()
+                print(u)
+                # User should have no messages & no followers
+                self.assertEqual(len(u.messages), 0)
+                self.assertEqual(len(u.followers), 0)
+                # User __repr__  displays correct information about User
+                self.assertEqual(u.__repr__(), f"<User #{u.id}: {u.username}, {u.email}>")
+
+    # def test_user_repr(self):
