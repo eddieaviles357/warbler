@@ -7,6 +7,9 @@ from sqlalchemy.exc import IntegrityError
 from forms import UserAddForm, LoginForm, MessageForm, EditUserForm
 from models import db, connect_db, User, Message, Likes
 from utils import array_to_set
+# seed db, use in command line using ipython
+from seed import init_db
+
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
@@ -186,20 +189,25 @@ def messages_liked(message_id):
         return redirect("/")
     
     try:
-        if (like:=Likes.query.filter(Likes.user_id==g.user.id)
+        if (liked:=Likes.query.filter(Likes.user_id==g.user.id)
             .filter(Likes.message_id==message_id)
             .first()):
-            
-            db.session.delete(like)
+            print('\n\nlike=',liked,':::message.id', liked.message_id, '\n\nisNone=', bool(liked), '\n\n')
+            db.session.delete(liked)
             db.session.commit()
+            print('COMMIT REMOVED LIKES\n')
             return redirect("/")
         like = Likes(user_id=g.user.id, message_id=message_id)
-        
+        print('\n\n*****like=',like,':::message.id', like.message_id, '\n\nisNone=', bool(like), '\n\n')
+        print('#######appending##########')
         db.session.add(like)
-        
+        print('((((((((------APPENDED----))))))))')
         db.session.commit()
+        print('####### --- COMMITED ---- #######')
     except IntegrityError as err:
         db.session.rollback()
+    except:
+        print('did not go through')
     return redirect("/")
 # ***************** UBOVE **************
 # **************** ATTN!!! *************
