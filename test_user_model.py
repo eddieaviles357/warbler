@@ -7,8 +7,8 @@
 
 import os
 from unittest import TestCase
-
 from models import db, User, Message, Follows
+from sqlalchemy import exc
 
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
@@ -113,4 +113,42 @@ class UserModelTestCase(TestCase):
     def test_signup(self):
         """ Test signup of user """
         with app.app_context():
+            users_orig = User.query.all()
+            # get length of orig users in db to be used to compare later
+            orig_users_len = len(users_orig)
+            db.session.add(
+                User(
+                    email="signup@test.com",
+                    username="signupusertest",
+                    password="SIGNUPUSERTEST"
+                    )
+                )
+            db.session.commit()
             users = User.query.all()
+            # get updated users length to compare old users length
+            users_len = len(users)
+            self.assertEqual(users_len, orig_users_len+1)
+            
+            # test integrityError same email
+            with self.assertRaises(exc.IntegrityError):
+                db.session.add(
+                    User(
+                    email="signup@test.com",
+                    username="wontwork",
+                    password="WONTWORK"
+                    )
+                )
+                db.session.commit()
+            db.session.rollback()
+            
+            # test integrityError with username
+            with self.assertRaises(exc.IntegrityError):
+                db.session.add(
+                    User(
+                    email="tester4@test.com",
+                    username="testuser",
+                    password="WONTWORK"
+                    )
+                )
+                db.session.commit()
+            db.session.rollback()
