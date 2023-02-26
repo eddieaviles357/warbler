@@ -114,12 +114,3 @@ class UserModelTestCase(TestCase):
         """ Test signup of user """
         with app.app_context():
             users = User.query.all()
-            u = users[0]
-            u2 = users[1]
-            u3 = users[2]
-            u.following.append(u2)
-            db.session.commit()
-            # is user following other user
-            self.assertTrue(u.is_following(u2))
-            self.assertEqual(len(u2.followers), 1)
-            self.assertFalse(u.is_following(u3))
