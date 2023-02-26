@@ -89,7 +89,27 @@ class UserModelTestCase(TestCase):
                 users = User.query.all()
                 u = users[0]
                 u2 = users[1]
+                u3 = users[2]
                 u.following.append(u2)
                 db.session.commit()
                 # is user being followed by other user
                 self.assertTrue(u2.is_followed_by(u))
+                self.assertEqual(len(u.following), 1)
+                self.assertFalse(u2.is_followed_by(u3))
+
+    def test_is_following(self):
+        """ Test for method is_following """
+        with self.client:
+            with app.app_context():
+                users = User.query.all()
+                u = users[0]
+                u2 = users[1]
+                u3 = users[2]
+                u.following.append(u2)
+                db.session.commit()
+                # is user following other user
+                self.assertTrue(u.is_following(u2))
+                self.assertEqual(len(u2.followers), 1)
+                self.assertFalse(u.is_following(u3))
+
+    
