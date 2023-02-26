@@ -130,25 +130,23 @@ class UserModelTestCase(TestCase):
             
             # test integrityError same email
             with self.assertRaises(exc.IntegrityError):
-                db.session.add(
-                    User(
+                User.signup(
                     email="signup@test.com",
                     username="wontwork",
-                    password="WONTWORK"
+                    password="WONTWORK",
+                    image_url=''
                     )
-                )
                 db.session.commit()
             db.session.rollback()
 
             # test integrityError with username
             with self.assertRaises(exc.IntegrityError):
-                db.session.add(
-                    User(
+                User.signup(
                     email="tester4@test.com",
                     username="testuser",
-                    password="WONTWORK"
+                    password="WONTWORK",
+                    image_url=''
                     )
-                )
                 db.session.commit()
             db.session.rollback()
 
