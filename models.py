@@ -198,7 +198,7 @@ class Message(db.Model):
         nullable=False,
     )
 
-    user = db.relationship('User', overlaps="messages")
+    user = db.relationship('User', overlaps='messages')
 
 
 def connect_db(app):
