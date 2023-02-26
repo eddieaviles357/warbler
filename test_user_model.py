@@ -26,21 +26,32 @@ from app import app
 # once for all tests --- in each test, we'll delete the data
 # and create fresh new clean test data
 with app.app_context():
+    db.drop_all()
     db.create_all()
-
 
 class UserModelTestCase(TestCase):
     """Test views for messages."""
 
     def setUp(self):
         """Create test client, add sample data."""
+        app.config.update({
+            "TESTING": True,
+            "SQLALCHEMY_ECHO": False,
+            "SQLALCHEMY_DATABASE_URI": os.environ.get('DATABASE_URL', 'postgresql:///blogly_test'),
+            "DEBUG_TB_HOSTS": ["dont-show-debug-toolbar"]
+            })
         with app.app_context():
             User.query.delete()
             Message.query.delete()
             Follows.query.delete()
 
         self.client = app.test_client()
-    
+
+    def tearDown(self):
+        """Clean up any fouled transaction."""
+        with app.app_context():
+            db.session.rollback()
+            
     def test_user_model(self):
         """Does basic model work?"""
 
@@ -53,6 +64,6 @@ class UserModelTestCase(TestCase):
             db.session.add(u)
             db.session.commit()
 
-        # User should have no messages & no followers
-        self.assertEqual(len(u.messages), 0)
-        self.assertEqual(len(u.followers), 0)
+            # User should have no messages & no followers
+            self.assertEqual(len(u.messages), 0)
+            self.assertEqual(len(u.followers), 0)
