@@ -192,18 +192,12 @@ def messages_liked(message_id):
         if (liked:=Likes.query.filter(Likes.user_id==g.user.id)
             .filter(Likes.message_id==message_id)
             .first()):
-            print('\n\nlike=',liked,':::message.id', liked.message_id, '\n\nisNone=', bool(liked), '\n\n')
             db.session.delete(liked)
             db.session.commit()
-            print('COMMIT REMOVED LIKES\n')
             return redirect("/")
         like = Likes(user_id=g.user.id, message_id=message_id)
-        print('\n\n*****like=',like,':::message.id', like.message_id, '\n\nisNone=', bool(like), '\n\n')
-        print('#######appending##########')
         db.session.add(like)
-        print('((((((((------APPENDED----))))))))')
         db.session.commit()
-        print('####### --- COMMITED ---- #######')
     except IntegrityError as err:
         db.session.rollback()
     except:
