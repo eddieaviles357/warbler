@@ -71,8 +71,10 @@ class UserViewsTestCase(TestCase):
         with app.app_context():
             db.session.rollback()
     
-    def test_(self):
-        """ Test for user views """
+    def test_basic_view(self):
+        """ Test for basic view views """
         with self.client:
-            with app.app_context():
-                users = User.query.all()
+            resp = self.client.get('/')
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("<h1>What's Happening?</h1>", html)
