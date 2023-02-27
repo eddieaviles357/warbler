@@ -87,8 +87,20 @@ class MessageModelTestCase(TestCase):
         with app.app_context():
             with self.assertRaises(exc.DataError):
                 m = Message(
-                    text='Hello this is a test to check for exceeding amount of characters that the message model can add to the database. This is going to be more than the max amount allowed for the model which is 140 characters Hello this is a test to check for exceeding amount of characters that the message model can add to the database. This is going to be more than the max amount allowed for the model which is 140 characters Hello this is a test to check for exceeding amount of characters that the message model can add to the database. This is going to be more than the max amount allowed for the model which is 140 characters',
+                    text="Hello this is a test to check for exceeding amount of characters that the message model can add to the database. This is going to be more than the max amount allowed for the model which is 140 characters Hello this is a test to check for exceeding amount of characters that the message model can add to the database. This is going to be more than the max amount allowed for the model which is 140 characters Hello this is a test to check for exceeding amount of characters that the message model can add to the database. This is going to be more than the max amount allowed for the model which is 140 characters",
                     user_id=self.u_id
+                )
+                db.session.add(m)
+                db.session.commit()
+                db.session.rollback()
+    
+    def test_message_no_user_id(self):
+        """ Test for no valid user_id in db """
+        with app.app_context():
+            with self.assertRaises(exc.IntegrityError):
+                m = Message(
+                    text="Test for message",
+                    user_id=8
                 )
                 db.session.add(m)
                 db.session.commit()
