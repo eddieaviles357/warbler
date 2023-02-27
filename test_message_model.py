@@ -92,7 +92,6 @@ class MessageModelTestCase(TestCase):
                 )
                 db.session.add(m)
                 db.session.commit()
-                db.session.rollback()
     
     def test_message_no_user_id(self):
         """ Test for no valid user_id in db """
@@ -104,4 +103,3 @@ class MessageModelTestCase(TestCase):
                 )
                 db.session.add(m)
                 db.session.commit()
-                db.session.rollback()
