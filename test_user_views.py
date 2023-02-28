@@ -64,10 +64,16 @@ class UserViewsTestCase(TestCase):
             )
             db.session.add_all([m, m2])
             db.session.commit()
+            u.following.append(u2)
+            u2.following.append(u)
+            db.session.commit()
+            
             self.u_id = u.id
             self.u_username = u.username
             self.u2_id = u2.id
             self.u2_username = u2.username
+
+            
 
     def tearDown(self):
         """Clean up any fouled transaction."""
@@ -105,9 +111,17 @@ class UserViewsTestCase(TestCase):
 
     def test_user_details(self):
         """ Test users detail page profile """
-        url = '/users/'
+        url = f'/users/{self.u_id}'
         with self.client:
-            resp = self.client.get(f"{url}{self.u_id}")
+            resp = self.client.get(url)
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
             self.assertIn(f'<a href="/users/{self.u_id}">@testuser</a>', html)
+
+    def test_user_following(self):
+        """ Test following page """
+        url = f'/users/{self.u_id}/following'
+        with self.client:
+            resp = self.client.get(url)
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200)
