@@ -127,10 +127,17 @@ class UserViewsTestCase(TestCase):
                 session["curr_user"] = self.u_id
             resp = c.get(url)
             html = resp.get_data(as_text=True)
-            # redirect
             self.assertEqual(resp.status_code, 200)
             self.assertIn(f'<p>@{self.u2_username}</p>', html)
 
-    # def test_user_followers(self):
-    #     """ Test followers page """
-    #     url = f'/users/{self.u_id}/following'
+    def test_user_followers(self):
+        """ Test followers page """
+        url = f'/users/{self.u_id}/following'
+        with self.client as c:
+            with c.session_transaction() as session:
+                # set session like if user is already logged in
+                session["curr_user"] = self.u_id
+            resp = c.get(url)
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn(f'<p>@{self.u2_username}</p>', html)
