@@ -172,7 +172,7 @@ def users_show(user_id):
 def display_likes(user_id):
     """Show users likes page"""
     
-    user = User.query.get_or_404(user_id)
+    user = User.query.filter(User.id==user_id).first()
 
     return render_template('users/likes.html', user=user, messages=user.likes)
 
@@ -256,7 +256,7 @@ def stop_following(follow_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    followed_user = User.query.get(follow_id)
+    followed_user = User.query.filter(User.id==follow_id).first()
     g.user.following.remove(followed_user)
     db.session.commit()
 
@@ -346,7 +346,7 @@ def messages_add():
 def messages_show(message_id):
     """Show a message."""
 
-    msg = Message.query.get(message_id)
+    msg = Message.query.filter(Message.id==message_id).first()
     return render_template('messages/show.html', message=msg)
 
 
@@ -358,7 +358,7 @@ def messages_destroy(message_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    msg = Message.query.get(message_id)
+    msg = Message.query.filter(Message.id==message_id).first()
     db.session.delete(msg)
     db.session.commit()
 
