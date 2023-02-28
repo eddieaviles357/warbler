@@ -37,7 +37,7 @@ def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
 
     if CURR_USER_KEY in session:
-        g.user = User.query.get(session[CURR_USER_KEY])
+        g.user = User.query.filter(User.id==session[CURR_USER_KEY]).first()
 
     else:
         g.user = None
@@ -217,7 +217,7 @@ def show_following(user_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    user = User.query.get_or_404(user_id)
+    user = User.query.filter(User.id==user_id).first()
     return render_template('users/following.html', user=user)
 
 
@@ -229,7 +229,7 @@ def users_followers(user_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    user = User.query.get_or_404(user_id)
+    user = User.query.filter(User.id==user_id).first()
     return render_template('users/followers.html', user=user)
 
 
@@ -241,7 +241,7 @@ def add_follow(follow_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    followed_user = User.query.get_or_404(follow_id)
+    followed_user = User.query.filter(User.id==follow_id).first()
     g.user.following.append(followed_user)
     db.session.commit()
 
