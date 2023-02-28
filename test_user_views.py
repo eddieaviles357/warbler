@@ -99,7 +99,15 @@ class UserViewsTestCase(TestCase):
         with self.client:
             resp = self.client.get(url)
             html = resp.get_data(as_text=True)
-            print(html)
             self.assertEqual(resp.status_code, 200)
             self.assertIn(f'<p>@{self.u_username}</p>' , html)
             self.assertIn(f'<p>@{self.u2_username}</p>' , html)
+
+    def test_user_show(self):
+        """ Test users detail page profile """
+        url = '/users/'
+        with self.client:
+            resp = self.client.get(f"{url}{self.u_id}")
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn(f'<a href="/users/{self.u_id}">@testuser</a>', html)
