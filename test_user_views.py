@@ -103,7 +103,7 @@ class UserViewsTestCase(TestCase):
             self.assertIn(f'<p>@{self.u_username}</p>' , html)
             self.assertIn(f'<p>@{self.u2_username}</p>' , html)
 
-    def test_user_show(self):
+    def test_user_details(self):
         """ Test users detail page profile """
         url = '/users/'
         with self.client:
