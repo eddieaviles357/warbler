@@ -82,3 +82,29 @@ class MessageViewTestCase(TestCase):
 
             msg = Message.query.one()
             self.assertEqual(msg.text, "Hello")
+
+
+    def test_remove_message(self):
+        """ Test for removing message """
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.testuser_id
+
+            with app.app_context():
+                user = User.query.filter(User.id==sess[CURR_USER_KEY]).first()
+                msg = Message(text='testing')
+                msg2 = Message(text='testing2')
+                user.messages.append(msg)
+                user.messages.append(msg2)
+                db.session.commit()
+                # user should have 2 messages added
+                self.assertEqual(len(user.messages), 2)
+                self.assertEqual(msg.text, 'testing')
+                self.assertEqual(msg2.text, 'testing2')
+                # should remove message from user
+                url = f'/messages/{msg.id}/delete'
+                resp = c.post(url, follow_redirects=True)
+                html = resp.get_data(as_text=True)
+                self.assertEqual(resp.status_code, 200)
+                # removed message should be one less
+                self.assertEqual(len(user.messages), 1)
