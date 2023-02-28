@@ -51,7 +51,7 @@ class UserViewsTestCase(TestCase):
                 password="HASHED_PASSWORD",
                 image_url=''
             )
-            db.session.add_all([u,u2])
+            # db.session.add_all([u,u2])
             db.session.commit()
 
             m = Message(
@@ -64,7 +64,10 @@ class UserViewsTestCase(TestCase):
             )
             db.session.add_all([m, m2])
             db.session.commit()
-
+            self.u_id = u.id
+            self.u_username = u.username
+            self.u2_id = u2.id
+            self.u2_username = u2.username
 
     def tearDown(self):
         """Clean up any fouled transaction."""
@@ -89,9 +92,14 @@ class UserViewsTestCase(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h2 class="join-message">Join Warbler today.</h2>', html)
             self.assertIn('<form action="/signup" method="POST" id="user_form">', html)
-    # def test_signup_post(self):
-    #     """ Test signing up POST """
-    #     url = '/signup'
 
-    #     with self.client:
-    #         resp = self.client.post(url)
+    def test_users(self):
+        """ Test users route """
+        url = '/users'
+        with self.client:
+            resp = self.client.get(url)
+            html = resp.get_data(as_text=True)
+            print(html)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn(f'<p>@{self.u_username}</p>' , html)
+            self.assertIn(f'<p>@{self.u2_username}</p>' , html)
