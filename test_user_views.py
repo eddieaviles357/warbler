@@ -73,8 +73,25 @@ class UserViewsTestCase(TestCase):
     
     def test_basic_view(self):
         """ Test for basic view views """
+        url = '/'
         with self.client:
-            resp = self.client.get('/')
+            resp = self.client.get(url)
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
             self.assertIn("<h1>What's Happening?</h1>", html)
+
+    def test_signup_get(self):
+        """ Test signup GET """
+        url = '/signup'
+        with self.client:
+            resp = self.client.get(url)
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h2 class="join-message">Join Warbler today.</h2>', html)
+            self.assertIn('<form action="/signup" method="POST" id="user_form">', html)
+    # def test_signup_post(self):
+    #     """ Test signing up POST """
+    #     url = '/signup'
+
+    #     with self.client:
+    #         resp = self.client.post(url)
