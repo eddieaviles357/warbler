@@ -3,6 +3,7 @@
 # run these tests like:
 #
 #    FLASK_ENV=production python -m unittest test_message_views.py
+#    FLASK_DEBUG=False python3 -m unittest test_message_views.py
 
 
 import os
@@ -26,40 +27,50 @@ from app import app, CURR_USER_KEY
 # once for all tests --- in each test, we'll delete the data
 # and create fresh new clean test data
 
-db.create_all()
-
-# Don't have WTForms use CSRF at all, since it's a pain to test
-
-app.config['WTF_CSRF_ENABLED'] = False
-
+with app.app_context():
+    db.drop_all()
+    db.create_all()
 
 class MessageViewTestCase(TestCase):
     """Test views for messages."""
 
     def setUp(self):
         """Create test client, add sample data."""
-
-        User.query.delete()
-        Message.query.delete()
-
         self.client = app.test_client()
+        # Don't have WTForms use CSRF at all, since it's a pain to test
+        app.config.update({
+            "TESTING": True,
+            "SQLALCHEMY_ECHO": False,
+            "SQLALCHEMY_DATABASE_URI": os.environ.get('DATABASE_URL', 'postgresql:///warbler-test'),
+            "DEBUG_TB_HOSTS": ["dont-show-debug-toolbar"],
+            "WTF_CSRF_ENABLED": False
+            })
+        with app.app_context():
+            User.query.delete()
+            Message.query.delete()
 
-        self.testuser = User.signup(username="testuser",
-                                    email="test@test.com",
-                                    password="testuser",
-                                    image_url=None)
+            testuser = User.signup(username="testuser",
+                                        email="test@test.com",
+                                        password="testuser",
+                                        image_url=None)
+            
+            db.session.commit()
+            # bound to session
+            self.testuser_id = testuser.id
 
-        db.session.commit()
+    def tearDown(self):
+        """Clean up any fouled transaction."""
+        with app.app_context():
+            db.session.rollback()
 
     def test_add_message(self):
         """Can use add a message?"""
 
         # Since we need to change the session to mimic logging in,
         # we need to use the changing-session trick:
-
         with self.client as c:
             with c.session_transaction() as sess:
-                sess[CURR_USER_KEY] = self.testuser.id
+                sess[CURR_USER_KEY] = self.testuser_id
 
             # Now, that session setting is saved, so we can have
             # the rest of ours test
