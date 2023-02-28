@@ -141,3 +141,5 @@ class UserViewsTestCase(TestCase):
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
             self.assertIn(f'<p>@{self.u2_username}</p>', html)
+
+            
