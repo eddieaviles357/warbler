@@ -156,7 +156,7 @@ def list_users():
 def users_show(user_id):
     """Show user profile."""
     
-    user = User.query.get_or_404(user_id)
+    user = User.query.filter(User.id==user_id).first()
 
     # snagging messages in order from the database;
     # user.messages won't be in order by default
@@ -288,8 +288,6 @@ def profile():
                 flash('Incorrect credentials', 'danger')
                 return redirect('/')
         except IntegrityError as err:
-            # print('\n\ntype=',type(err.orig), '***', err.orig,'\n\n\n')
-            # print('\n\ntype=', type(err.statement), '***', err.statement, '\n\n\n')
             field_err = None
             if 'username' in str(err.orig):
                 field_err = 'Username'
